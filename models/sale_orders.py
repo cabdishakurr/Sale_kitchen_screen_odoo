@@ -15,33 +15,22 @@ class WebsiteOrderLine(models.Model):
         string='Order Reference',
         help='Order reference of website order')
     requires_cooking = fields.Boolean(
+        related='product_id.requires_cooking',
         string="Requires Cooking", 
-        default=False,
+        store=True,
         help='To identify if the order needs kitchen preparation')
-    customer_id = fields.Many2one(
-        'res.partner', 
-        string="Customer",
-        related='order_id.partner_id',
-        help='Customer who placed the order')
 
-    def get_kitchen_order_details(self, ids):
-        """To get the product details for kitchen"""
-        lines = self.env['sale.order'].browse(ids)
-        res = []
-        for rec in lines:
-            res.append({
-                'product_id': rec.product_id.id,
-                'name': rec.product_id.name,
-                'qty': rec.product_uom_qty
-            })
-        return res
+    @api.depends('requires_cooking', 'kitchen_status')
+    def _compute_display_name(self):
+        for line in self:
+            line.display_name = f"{line.product_id.name} ({line.kitchen_status})" if line.requires_cooking else line.product_id.name
 
     def kitchen_progress_change(self):
         """Change the kitchen order status"""
         if self.kitchen_status == 'ready':
             self.kitchen_status = 'waiting'
         else:
-            self.kitchen_status = 'ready' 
+            self.kitchen_status = 'ready'
 
 class WebsiteOrder(models.Model):
     _inherit = 'sale.order'
@@ -49,7 +38,8 @@ class WebsiteOrder(models.Model):
 
     requires_cooking = fields.Boolean(
         string="Requires Kitchen Preparation",
-        default=False,
+        compute='_compute_requires_cooking',
+        store=True,
         help='Indicates if this order needs kitchen preparation')
     kitchen_status = fields.Selection(
         selection=[
@@ -58,5 +48,28 @@ class WebsiteOrder(models.Model):
             ('ready', 'Ready'),
             ('cancel', 'Cancel')
         ],
-        default='draft',
-        help='Kitchen preparation status') 
+        compute='_compute_kitchen_status',
+        store=True,
+        help='Kitchen preparation status')
+
+    @api.depends('order_line.requires_cooking')
+    def _compute_requires_cooking(self):
+        for order in self:
+            order.requires_cooking = any(line.requires_cooking for line in order.order_line)
+
+    @api.depends('order_line.kitchen_status')
+    def _compute_kitchen_status(self):
+        for order in self:
+            if not order.requires_cooking:
+                order.kitchen_status = False
+                continue
+            
+            statuses = order.order_line.filtered('requires_cooking').mapped('kitchen_status')
+            if not statuses:
+                order.kitchen_status = 'draft'
+            elif all(status == 'ready' for status in statuses):
+                order.kitchen_status = 'ready'
+            elif all(status == 'cancel' for status in statuses):
+                order.kitchen_status = 'cancel'
+            else:
+                order.kitchen_status = 'waiting' 

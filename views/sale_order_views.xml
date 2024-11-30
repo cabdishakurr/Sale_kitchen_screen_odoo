@@ -1,15 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Inherit Sale Order Form View -->
     <record id="website_kitchen_order_form_view" model="ir.ui.view">
         <field name="name">sale.order.website.kitchen.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="requires_cooking"/>
                 <field name="kitchen_status" 
                        attrs="{'invisible': [('requires_cooking', '=', False)]}"/>
             </xpath>
+        </field>
+    </record>
+
+    <!-- Kitchen Orders Tree View -->
+    <record id="website_kitchen_order_tree_view" model="ir.ui.view">
+        <field name="name">sale.order.website.kitchen.tree</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_order"/>
+                <field name="kitchen_status"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Kitchen Orders Action -->
+    <record id="action_website_kitchen_orders" model="ir.actions.act_window">
+        <field name="name">Kitchen Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('requires_cooking', '=', True)]</field>
+        <field name="context">{'default_requires_cooking': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No kitchen orders found
+            </p>
+            <p>
+                Orders that require kitchen preparation will appear here.
+            </p>
         </field>
     </record>
 </odoo> 
