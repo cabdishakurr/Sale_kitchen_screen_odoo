@@ -45,12 +45,13 @@
     'website': "https://www.cybrosys.com",
     'depends': ['pos_restaurant'],
     'data': [
-        'security/pos_kitchen_screen_groups.xml',
-        "security/ir.model.access.csv",
+        'security/security.xml',
+        'security/ir.model.access.csv',
         'data/kitchen_screen_sequence_data.xml',
-        "views/kitchen_screen_views.xml",
-        "views/pos_kitchen_screen_odoo_menus.xml",
-        "views/pos_order_views.xml",
+        'views/sale_order_views.xml',
+        'views/kitchen_screen_views.xml',
+        'views/pos_kitchen_screen_odoo_menus.xml',
+        'views/pos_order_views.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

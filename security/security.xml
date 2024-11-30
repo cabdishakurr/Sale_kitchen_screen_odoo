@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Module Category -->
+    <record model="ir.module.category" id="module_category_website_kitchen">
+        <field name="name">Website Kitchen Screen</field>
+        <field name="description">Manage kitchen orders from website</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Kitchen Cook Group -->
+    <record id="group_kitchen_cook" model="res.groups">
+        <field name="name">Kitchen Cook</field>
+        <field name="category_id" ref="module_category_website_kitchen"/>
+        <field name="comment">Users with this access right can view and process kitchen orders.</field>
+    </record>
+
+    <!-- Kitchen Manager Group -->
+    <record id="group_kitchen_manager" model="res.groups">
+        <field name="name">Kitchen Manager</field>
+        <field name="category_id" ref="module_category_website_kitchen"/>
+        <field name="implied_ids" eval="[(4, ref('group_kitchen_cook'))]"/>
+        <field name="comment">Users with this access right can manage kitchen configurations and all orders.</field>
+    </record>
+</odoo> 
