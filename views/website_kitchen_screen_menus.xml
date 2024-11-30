@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main menu item -->
+    <menuitem id="menu_website_kitchen_root"
+              name="Kitchen Orders"
+              web_icon="website_kitchen_screen,static/description/icon.png"
+              sequence="50"/>
+
+    <!-- Kitchen Screen menu -->
+    <menuitem id="menu_website_kitchen_screen"
+              name="Kitchen Screen"
+              parent="menu_website_kitchen_root"
+              action="action_website_kitchen_screen"
+              sequence="10"/>
+
+    <!-- Orders menu -->
+    <menuitem id="menu_website_kitchen_orders"
+              name="Orders"
+              parent="menu_website_kitchen_root"
+              action="action_website_kitchen_orders"
+              sequence="20"/>
+</odoo> 
